@@ -36,3 +36,12 @@ train['Embarked'] = train['Embarked'].fillna('S')
 # Replace the one null Fare value with 7
 test['Fare'] = test['Fare'].fillna(7)
 
+# Drop the name column, since I don't think name will have any useful information
+train = train.drop(['Name'], axis = 1)
+test = test.drop(['Name'], axis = 1)
+
+# For the Sex class, I'm going to change this into a binary class, male = 1, female = 0
+sex_dictionary = {'female':0, 'male':1}
+train['Sex'] = train['Sex'].map(sex_dictionary)
+test['Sex'] = test['Sex'].map(sex_dictionary)
+
