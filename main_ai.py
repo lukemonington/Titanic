@@ -45,3 +45,29 @@ sex_dictionary = {'female':0, 'male':1}
 train['Sex'] = train['Sex'].map(sex_dictionary)
 test['Sex'] = test['Sex'].map(sex_dictionary)
 
+# For the embarked column, there seems to be two rows with a value of "", replace that with "S" (most common)
+print(train['Embarked'].value_counts().sort_values())
+train['Embarked'] = train['Embarked'].replace("", "S")
+print(test['Embarked'].value_counts().sort_values())
+
+train.shape
+# Train shape = (891, 10)
+test.shape
+# Test shape = 418, 9
+
+target_df = train['Survived']
+train = train.drop(['Survived'], axis = 1)
+
+train_test_list = [train,test]
+train_test_df = pd.concat(train_test_list, axis = 0)
+
+train_test_dummies = train_test_df['Embarked']
+train_test_df = train_test_df.drop(['Embarked'], axis = 1)
+
+dummy_df = pd.get_dummies(train_test_dummies, sparse = False)
+dummies_list = [train_test_df, dummy_df]
+train_test_df = pd.concat(dummies_list, axis = 1)
+
+train = train_test_df.iloc[0:891,:]
+test = train_test_df.iloc[891:,:]
+
