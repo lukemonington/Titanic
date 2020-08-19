@@ -8,3 +8,4 @@ train = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\train.cs
 test = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\test.csv')
 
 train.head()
+
