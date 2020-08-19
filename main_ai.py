@@ -9,3 +9,4 @@ test = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\test.csv'
 
 train.head()
 
+#this is in the Initial-EDA branch
