@@ -1,6 +1,10 @@
 import pandas as pd
 pd.set_option('max_columns', None)
 import numpy as np
+from sklearn.model_selection import train_test_split
+import xgboost
+from xgboost import XGBClassifier
+from sklearn.metrics import accuracy_score
 
 
 # Get train and test dataset
@@ -71,3 +75,28 @@ train_test_df = pd.concat(dummies_list, axis = 1)
 train = train_test_df.iloc[0:891,:]
 test = train_test_df.iloc[891:,:]
 
+train = train.drop(['Ticket'], axis = 1)
+test = test.drop(['Ticket'], axis = 1)
+seed = 7
+test_size = 0.2
+X_train, X_test, y_train, y_test = train_test_split(train, target_df, test_size=test_size, random_state=seed)
+
+# Using data to train AI
+model = XGBClassifier(
+    learning_rate = 0.1,
+    n_estimators = 500,
+    max_depth = 7,
+    min_child_weight = 0.5)
+
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy: %.2f%%" % (accuracy * 100.0))
+
+pred = model.predict(test)
+# Creating submission csv file
+submission = pd.DataFrame(IDs, columns = ['id'])
+submission['target'] = pred
+path = r'C:\Users\lukem\Desktop\Github AI Projects\Submissions\ '
+submission.to_csv(path + 'xgb_submission_v6.csv', index = False)
