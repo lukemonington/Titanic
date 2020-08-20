@@ -10,8 +10,8 @@ from sklearn.metrics import accuracy_score
 # Get train and test dataset
 train = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\train.csv')
 test = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\test.csv')
-
-train.head()
+example_submission = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\gender_submission.csv')
+PassIDs = test['PassengerId']
 
 #this is in the Initial-EDA branch
 
@@ -96,7 +96,7 @@ print("Accuracy: %.2f%%" % (accuracy * 100.0))
 
 pred = model.predict(test)
 # Creating submission csv file
-submission = pd.DataFrame(IDs, columns = ['id'])
+submission = pd.DataFrame(PassIDs, columns = ['id'])
 submission['target'] = pred
-path = r'C:\Users\lukem\Desktop\Github AI Projects\Submissions\ '
-submission.to_csv(path + 'xgb_submission_v6.csv', index = False)
+path = r"C:\Users\lukem\Desktop\Github AI Projects\Titanic\submissions\titanic_submission_1.csv"
+submission.to_csv(path, index = False)
