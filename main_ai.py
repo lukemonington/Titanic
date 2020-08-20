@@ -84,8 +84,8 @@ X_train, X_test, y_train, y_test = train_test_split(train, target_df, test_size=
 # Using data to train AI
 model = XGBClassifier(
     learning_rate = 0.1,
-    n_estimators = 500,
-    max_depth = 7,
+    n_estimators = 75,
+    max_depth = 3,
     min_child_weight = 0.5)
 
 model.fit(X_train, y_train)

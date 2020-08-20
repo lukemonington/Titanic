@@ -1,0 +1,12 @@
+Accuracy = 78.21%: learning rate = 0.1, max_depth = 7, n_estimators = 50
+Accuracy = 78.77%: learning rate = 0.1, max_depth = 7, n_estimators = 75
+Accuracy = 77.09%: learning rate = 0.1, max_depth = 7, n_estimators = 100
+Accuracy = 76.54%: learning rate = 0.1, max_depth = 7, n_estimators = 250
+Accuracy = 76.54%: learning rate = 0.1, max_depth = 7, n_estimators = 500
+Accuracy = 76.54%: learning rate = 0.1, max_depth = 7, n_estimators = 700
+Accuracy = 75.98%: learning rate = 0.1, max_depth = 7, n_estimators = 1000
+*keep it at n_estimators = 75
+
+Accuracy = 78.77%: learning rate = 0.1, max_depth = 7, n_estimators = 75
+Accuracy = 77.65%: learning rate = 0.1, max_depth = 5, n_estimators = 75
+Accuracy = 78.21%: learning rate = 0.1, max_depth = 3, n_estimators = 75
