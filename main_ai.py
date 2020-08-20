@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 import xgboost
 from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold
 
 
 # Get train and test dataset
@@ -72,14 +73,24 @@ dummy_df = pd.get_dummies(train_test_dummies, sparse = False)
 dummies_list = [train_test_df, dummy_df]
 train_test_df = pd.concat(dummies_list, axis = 1)
 
+#train_and_target = train_test_df.iloc[0:891,:]
 train = train_test_df.iloc[0:891,:]
 test = train_test_df.iloc[891:,:]
 
 train = train.drop(['Ticket'], axis = 1)
 test = test.drop(['Ticket'], axis = 1)
+#train_and_target = train_and_target.drop(['Ticket'], axis = 1)
+#train_and_target = train_and_target.drop(['PassengerId'], axis = 1)
+
+append_these = [train, target_df]
+train_and_target = pd.concat(append_these, axis = 1)
+train_and_target = train_and_target.drop(['PassengerId'], axis = 1)
+
+#test_df_train = train_and_target.iloc[:,:-1]
+#test_df_test = train_and_target.iloc[:,-1]
+
 seed = 7
 test_size = 0.2
-X_train, X_test, y_train, y_test = train_test_split(train, target_df, test_size=test_size, random_state=seed)
 
 # Using data to train AI
 model = XGBClassifier(
@@ -88,15 +99,33 @@ model = XGBClassifier(
     max_depth = 3,
     min_child_weight = 0.5)
 
-model.fit(X_train, y_train)
 
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
+# KFold cross validation
+kf =KFold(n_splits = 5, random_state = 1, shuffle = True)
+accuracy_stats = list()
+
+for train_index, test_index in kf.split(train):
+    X_train = train_and_target.iloc[train_index,:-1]
+    y_train = train_and_target.iloc[train_index,-1]
+    X_validation = train_and_target.iloc[test_index, :-1]
+    y_validation = train_and_target.iloc[test_index,-1]
+    model.fit(X_train, y_train)
+
+    y_pred = model.predict(X_validation)
+    accuracy_stats.append(accuracy_score(y_validation, y_pred))
+    
+    
+#X_train, X_test, y_train, y_test = train_test_split(train, target_df, test_size=test_size, random_state=seed)
+average = sum(accuracy_stats)/len(accuracy_stats)
+print(average)
+
+
+
 print("Accuracy: %.2f%%" % (accuracy * 100.0))
 
 pred = model.predict(test)
 # Creating submission csv file
 submission = pd.DataFrame(PassIDs, columns = ['PassengerId'])
 submission['Survived'] = pred
-path = r"C:\Users\lukem\Desktop\Github AI Projects\Titanic\submissions\titanic_submission_1.csv"
+path = r"C:\Users\lukem\Desktop\Github AI Projects\Titanic\submissions\titanic_submission_2.csv"
 submission.to_csv(path, index = False)
