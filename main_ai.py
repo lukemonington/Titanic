@@ -96,7 +96,7 @@ print("Accuracy: %.2f%%" % (accuracy * 100.0))
 
 pred = model.predict(test)
 # Creating submission csv file
-submission = pd.DataFrame(PassIDs, columns = ['id'])
-submission['target'] = pred
+submission = pd.DataFrame(PassIDs, columns = ['PassengerId'])
+submission['Survived'] = pred
 path = r"C:\Users\lukem\Desktop\Github AI Projects\Titanic\submissions\titanic_submission_1.csv"
 submission.to_csv(path, index = False)
