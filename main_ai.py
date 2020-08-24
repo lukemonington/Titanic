@@ -2,9 +2,15 @@ import pandas as pd
 pd.set_option('max_columns', None)
 import numpy as np
 from sklearn.model_selection import train_test_split
-import xgboost
+import xgboost as xgb
 from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score
+from sklearn import preprocessing
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.metrics import mean_absolute_error
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.impute import SimpleImputer
 
 
 # Get train and test dataset
@@ -13,90 +19,83 @@ test = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\test.csv'
 example_submission = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\gender_submission.csv')
 PassIDs = test['PassengerId']
 
-#this is in the Initial-EDA branch
+target = train['Survived']
+train = train.drop('Survived', axis = 1)
 
+train = train.fillna(-999)
+test = test.fillna(-999)
 
-train.dtypes
-# from this we can see that PassengerId, Survived, Pclass, SibSp, and Parch are dtype int64
-# Fare is dtype float64
-# Name, Sex, Ticket, Cabin, and Embarked are dtype object
+X_train = train
+X_test = test
+y_train = target
 
-train.isnull().sum()
-# From this we can see that Cabin has 687 null values, Age has 177, and Embarked has 2
-# Since Cabin has so many null values, I'm just going to remove that column
-train = train.drop(['Cabin'], axis = 1)
-test = test.drop(['Cabin'], axis = 1)
+# For loop to encode all columns with "object" datatype
+for f in X_train.columns:
+    if X_train[f].dtype == "object" or X_test[f].dtype == "object":
+        lbl = preprocessing.LabelEncoder()
+        lbl.fit(list(X_train[f].values) + list(X_test[f].values))
+        X_train[f] = lbl.transform(list(X_train[f].values))
+        X_test[f] = lbl.transform(list(X_test[f].values))
 
-train.shape
+X = X_train
+y = y_train
+test = X_test
 
-# Replace the null age values with 21
-train['Age'] = train['Age'].fillna(21)
-test['Age'] = test['Age'].fillna(21)
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size = 0.2)
 
-# Replace the null Embarked values with S
-train['Embarked'] = train['Embarked'].fillna('S')
-train['Embarked'] = train['Embarked'].fillna('S')
+def get_mae(max_leaf_nodes, X_train, X_val, y_train, y_val):
+    dtr = DecisionTreeRegressor(max_leaf_nodes = max_leaf_nodes)
+    dtr.fit(X_train, y_train)
+    preds = dtr.predict(X_val)
+    mae = mean_absolute_error(preds, y_val)
+    return(mae)
 
-# Replace the one null Fare value with 7
-test['Fare'] = test['Fare'].fillna(7)
+def get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y):
+    model = DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes, random_state=0)
+    model.fit(train_X, train_y)
+    preds_val = model.predict(val_X)
+    mae = mean_absolute_error(val_y, preds_val)
+    return(mae)
 
-# Drop the name column, since I don't think name will have any useful information
-train = train.drop(['Name'], axis = 1)
-test = test.drop(['Name'], axis = 1)
-
-# For the Sex class, I'm going to change this into a binary class, male = 1, female = 0
-sex_dictionary = {'female':0, 'male':1}
-train['Sex'] = train['Sex'].map(sex_dictionary)
-test['Sex'] = test['Sex'].map(sex_dictionary)
-
-# For the embarked column, there seems to be two rows with a value of "", replace that with "S" (most common)
-print(train['Embarked'].value_counts().sort_values())
-train['Embarked'] = train['Embarked'].replace("", "S")
-print(test['Embarked'].value_counts().sort_values())
-
-train.shape
-# Train shape = (891, 10)
-test.shape
-# Test shape = 418, 9
-
-target_df = train['Survived']
-train = train.drop(['Survived'], axis = 1)
-
-train_test_list = [train,test]
-train_test_df = pd.concat(train_test_list, axis = 0)
-
-train_test_dummies = train_test_df['Embarked']
-train_test_df = train_test_df.drop(['Embarked'], axis = 1)
-
-dummy_df = pd.get_dummies(train_test_dummies, sparse = False)
-dummies_list = [train_test_df, dummy_df]
-train_test_df = pd.concat(dummies_list, axis = 1)
-
-train = train_test_df.iloc[0:891,:]
-test = train_test_df.iloc[891:,:]
-
-train = train.drop(['Ticket'], axis = 1)
-test = test.drop(['Ticket'], axis = 1)
-seed = 7
-test_size = 0.2
-X_train, X_test, y_train, y_test = train_test_split(train, target_df, test_size=test_size, random_state=seed)
-
-# Using data to train AI
-model = XGBClassifier(
-    learning_rate = 0.1,
-    n_estimators = 75,
-    max_depth = 3,
-    min_child_weight = 0.5)
-
+model = DecisionTreeRegressor(max_leaf_nodes=20, random_state=0)
 model.fit(X_train, y_train)
+preds_val = model.predict(X_val)
+mae = mean_absolute_error(y_val, preds_val)
+print(mae)
 
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-print("Accuracy: %.2f%%" % (accuracy * 100.0))
+train_X = X_train
+train_y = y_train
+val_X = X_val
+val_y = y_val
+forest_model = RandomForestRegressor(random_state=1)
+forest_model.fit(train_X, train_y)
+melb_preds = forest_model.predict(val_X)
+print(mean_absolute_error(val_y, melb_preds))
 
-pred = model.predict(test)
-# Creating submission csv file
+leafs_to_test = [2, 20, 50, 500]
+
+for i in leafs_to_test:
+    my_mae = get_mae(i, X_train, X_val, y_train, y_val)
+    print("max_leaf_nodes: %d, mean absolute error: %d" %(i, my_mae))
+
+
+clf = xgb.XGBClassifier(
+    n_estimators=500,
+    max_depth=9,
+    learning_rate=0.05,
+    subsample=0.9,
+    colsample_bytree=0.9,
+    missing=-999,
+    random_state=2019,
+    tree_method='gpu_hist'  # THE MAGICAL PARAMETER
+)
+%time clf.fit(X_train, y_train)
+
+
+pred = clf.predict(X_test)
+
+
 submission = pd.DataFrame(PassIDs, columns = ['PassengerId'])
 submission['Survived'] = pred
-path = r"C:\Users\lukem\Desktop\Github AI Projects\Titanic\submissions\titanic_submission_1.csv"
-submission.to_csv(path, index = False)
+path = r"C:\Users\lukem\Desktop\Github AI Projects\Submissions\Titanic\ "
+submission.to_csv(path + "submissionv1.csv", index = False)
