@@ -21,13 +21,13 @@ PassIDs = test['PassengerId']
 
 target = train['Survived']
 train = train.drop('Survived', axis = 1)
+train_cols = train.columns
+X_train_imputed = train.copy()
 
-for f in X_train.columns:
-    if X_train[f].isnull().sum() > 0:
-        imp = SimpleImputer()
+imp = SimpleImputer(missing_values = np.nan, strategy = 'most_frequent', copy = True)
+X_train_imputed = pd.DataFrame(imp.fit_transform(X_train_imputed))
+X_train_imputed.columns = train_cols
 
-train = train.fillna(-999)
-test = test.fillna(-999)
 
 X_train = train
 X_test = test
