@@ -7,6 +7,8 @@ from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score
 from sklearn import preprocessing
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.metrics import mean_absolute_error
+from sklearn.tree import DecisionTreeRegressor
 
 
 # Get train and test dataset
