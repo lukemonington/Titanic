@@ -23,14 +23,17 @@ target = train['Survived']
 train = train.drop('Survived', axis = 1)
 train_cols = train.columns
 X_train_imputed = train.copy()
+test_imputed = test.copy()
 
 imp = SimpleImputer(missing_values = np.nan, strategy = 'most_frequent', copy = True)
 X_train_imputed = pd.DataFrame(imp.fit_transform(X_train_imputed))
+test_imputed = pd.DataFrame(imp.transform(test_imputed))
+
 X_train_imputed.columns = train_cols
+test_imputed.columns = train_cols
 
-
-X_train = train
-X_test = test
+X_train = X_train_imputed
+X_test = test_imputed
 y_train = target
 
 # For loop to encode all columns with "object" datatype
@@ -102,4 +105,4 @@ pred = clf.predict(X_test)
 submission = pd.DataFrame(PassIDs, columns = ['PassengerId'])
 submission['Survived'] = pred
 path = r"C:\Users\lukem\Desktop\Github AI Projects\Submissions\Titanic\ "
-submission.to_csv(path + "submissionv1.csv", index = False)
+submission.to_csv(path + "trying-out-imputation-submissionv1.csv", index = False)
