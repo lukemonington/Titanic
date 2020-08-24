@@ -22,6 +22,10 @@ PassIDs = test['PassengerId']
 target = train['Survived']
 train = train.drop('Survived', axis = 1)
 
+for f in X_train.columns:
+    if X_train[f].isnull().sum() > 0:
+        imp = SimpleImputer()
+
 train = train.fillna(-999)
 test = test.fillna(-999)
 
