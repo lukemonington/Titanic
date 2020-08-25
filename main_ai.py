@@ -14,27 +14,26 @@ from sklearn.impute import SimpleImputer
 
 
 # Get train and test dataset
-train = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\train.csv')
-test = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\test.csv')
+X_train = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\train.csv')
+X_test = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\test.csv')
 example_submission = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\gender_submission.csv')
-PassIDs = test['PassengerId']
 
-target = train['Survived']
-train = train.drop('Survived', axis = 1)
-train_cols = train.columns
-X_train_imputed = train.copy()
-test_imputed = test.copy()
+PassIDs = X_test['PassengerId']
+y_train = X_train['Survived']
+X_train = X_train.drop('Survived', axis = 1)
+train_cols = X_train.columns
+
 
 imp = SimpleImputer(missing_values = np.nan, strategy = 'most_frequent', copy = True)
-X_train_imputed = pd.DataFrame(imp.fit_transform(X_train_imputed))
-test_imputed = pd.DataFrame(imp.transform(test_imputed))
+X_train = pd.DataFrame(imp.fit_transform(X_train))
+X_test = pd.DataFrame(imp.transform(X_test))
 
-X_train_imputed.columns = train_cols
-test_imputed.columns = train_cols
+X_train.columns = train_cols
+X_test.columns = train_cols
 
-X_train = X_train_imputed
-X_test = test_imputed
-y_train = target
+
+X_train.set_index('PassengerId', inplace = True)
+X_test.set_index('PassengerId', inplace = True)
 
 # For loop to encode all columns with "object" datatype
 for f in X_train.columns:
