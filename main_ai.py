@@ -43,24 +43,14 @@ for f in X_train.columns:
         X_train[f] = lbl.transform(list(X_train[f].values))
         X_test[f] = lbl.transform(list(X_test[f].values))
 
-X = X_train
-y = y_train
-test = X_test
 
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size = 0.2)
+X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size = 0.2)
 
 def get_mae(max_leaf_nodes, X_train, X_val, y_train, y_val):
-    dtr = DecisionTreeRegressor(max_leaf_nodes = max_leaf_nodes)
+    dtr = DecisionTreeRegressor(max_leaf_nodes = max_leaf_nodes, random_state = 2020)
     dtr.fit(X_train, y_train)
     preds = dtr.predict(X_val)
     mae = mean_absolute_error(preds, y_val)
-    return(mae)
-
-def get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y):
-    model = DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes, random_state=0)
-    model.fit(train_X, train_y)
-    preds_val = model.predict(val_X)
-    mae = mean_absolute_error(val_y, preds_val)
     return(mae)
 
 model = DecisionTreeRegressor(max_leaf_nodes=20, random_state=0)
@@ -69,20 +59,17 @@ preds_val = model.predict(X_val)
 mae = mean_absolute_error(y_val, preds_val)
 print(mae)
 
-train_X = X_train
-train_y = y_train
-val_X = X_val
-val_y = y_val
+
 forest_model = RandomForestRegressor(random_state=1)
-forest_model.fit(train_X, train_y)
-melb_preds = forest_model.predict(val_X)
-print(mean_absolute_error(val_y, melb_preds))
+forest_model.fit(X_train, y_train)
+melb_preds = forest_model.predict(X_val)
+print(mean_absolute_error(y_val, melb_preds))
 
 leafs_to_test = [2, 20, 50, 500]
-
+my_mae = list()
 for i in leafs_to_test:
-    my_mae = get_mae(i, X_train, X_val, y_train, y_val)
-    print("max_leaf_nodes: %d, mean absolute error: %d" %(i, my_mae))
+    my_mae.append(get_mae(i, X_train, X_val, y_train, y_val))
+    print(f"max_leaf_nodes: {i}, mean absolute error: {my_mae[-1]}")
 
 
 clf = xgb.XGBClassifier(
@@ -104,4 +91,4 @@ pred = clf.predict(X_test)
 submission = pd.DataFrame(PassIDs, columns = ['PassengerId'])
 submission['Survived'] = pred
 path = r"C:\Users\lukem\Desktop\Github AI Projects\Submissions\Titanic\ "
-submission.to_csv(path + "trying-out-imputation-submissionv1.csv", index = False)
+submission.to_csv(path + "trying-out-imputation-submissionv2.csv", index = False)
