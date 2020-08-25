@@ -46,29 +46,33 @@ for f in X_train.columns:
 
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size = 0.2)
 
-def get_mae(max_leaf_nodes, X_train, X_val, y_train, y_val):
+def test_dtregressor(max_leaf_nodes, X_train, X_val, y_train, y_val):
     dtr = DecisionTreeRegressor(max_leaf_nodes = max_leaf_nodes, random_state = 2020)
     dtr.fit(X_train, y_train)
     preds = dtr.predict(X_val)
     mae = mean_absolute_error(preds, y_val)
     return(mae)
 
-model = DecisionTreeRegressor(max_leaf_nodes=20, random_state=0)
-model.fit(X_train, y_train)
-preds_val = model.predict(X_val)
-mae = mean_absolute_error(y_val, preds_val)
-print(mae)
+def test_rfregressor(n_estimators, X_train, X_val, y_train, y_val):
+    rf = RandomForestRegressor(n_estimators = n_estimators, random_state = 2020)
+    rf.fit(X_train, y_train)
+    preds = rf.predict(X_val)
+    mae = mean_absolute_error(preds, y_val)
+    return(mae)
 
 
-forest_model = RandomForestRegressor(random_state=1)
-forest_model.fit(X_train, y_train)
-melb_preds = forest_model.predict(X_val)
-print(mean_absolute_error(y_val, melb_preds))
+# test different values for random forest
+estimators_to_test = [50, 100, 250, 500]
+my_mae = list()
+for i in estimators_to_test:
+    my_mae.append(test_rfregressor(i, X_train, X_val, y_train, y_val))
+    print(f"n_estimators: {i}, mean_absolute_error: {my_mae[-1]}")
 
+# test different values for decision tree
 leafs_to_test = [2, 20, 50, 500]
 my_mae = list()
 for i in leafs_to_test:
-    my_mae.append(get_mae(i, X_train, X_val, y_train, y_val))
+    my_mae.append(test_dtregressor(i, X_train, X_val, y_train, y_val))
     print(f"max_leaf_nodes: {i}, mean absolute error: {my_mae[-1]}")
 
 
