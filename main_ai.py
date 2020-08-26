@@ -46,7 +46,7 @@ for f in X_train.columns:
         X_train[f] = lbl.transform(list(X_train[f].values))
         X_test[f] = lbl.transform(list(X_test[f].values))
 
-
+X_train = X_train[['Sex','Age','Pclass','Parch','SibSp','Cabin']]
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size = 0.2)
 
 def test_dtregressor(max_leaf_nodes, X_train, X_val, y_train, y_val):
@@ -96,6 +96,9 @@ with open(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\titanic-importance
 # I think this allows me to select only the columns that are above a certain threshhold
 sel = SelectFromModel(perm, threshold=0.04, prefit=True)
 X_trans = sel.transform(X_train)
+
+
+
 
 clf = xgb.XGBClassifier(
     n_estimators=500,
