@@ -11,6 +11,8 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer
+import eli5
+from eli5.sklearn import PermutationImportance
 
 
 # Get train and test dataset
@@ -75,6 +77,20 @@ for i in leafs_to_test:
     my_mae.append(test_dtregressor(i, X_train, X_val, y_train, y_val))
     print(f"max_leaf_nodes: {i}, mean absolute error: {my_mae[-1]}")
 
+final_dtr = DecisionTreeRegressor(max_leaf_nodes = 500, random_state = 2020)
+final_dtr.fit(X_train, y_train)
+preds = final_dtr.predict(X_val)
+
+# Trying out permutation importance 
+# Permutation importance asks: If I randomly shuffle a single column of the validation data, leaving the target and all
+# other columns in place, how would that affect the accuracy of predictions in that now-shuffled data?
+perm = PermutationImportance(final_dtr, random_state=1).fit(X_val, y_val)
+# Store feature weights in an object
+html_obj = eli5.show_weights(perm, feature_names = X_val.columns.tolist())
+
+# Write html object to a file (adjust file path; Windows path is used here)
+with open(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\titanic-importance.htm','wb') as f:
+    f.write(html_obj.data.encode("UTF-8"))
 
 clf = xgb.XGBClassifier(
     n_estimators=500,
