@@ -13,6 +13,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer
 import eli5
 from eli5.sklearn import PermutationImportance
+from sklearn.feature_selection import SelectFromModel
 
 
 # Get train and test dataset
@@ -91,6 +92,10 @@ html_obj = eli5.show_weights(perm, feature_names = X_val.columns.tolist())
 # Write html object to a file (adjust file path; Windows path is used here)
 with open(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\titanic-importance.htm','wb') as f:
     f.write(html_obj.data.encode("UTF-8"))
+    
+# I think this allows me to select only the columns that are above a certain threshhold
+sel = SelectFromModel(perm, threshold=0.04, prefit=True)
+X_trans = sel.transform(X_train)
 
 clf = xgb.XGBClassifier(
     n_estimators=500,
