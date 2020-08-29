@@ -4,6 +4,7 @@ from sklearn.impute import SimpleImputer
 from sklearn import preprocessing
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 
 train = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\train.csv')
@@ -44,3 +45,17 @@ X = train_converted
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 clf = lgb.LGBMClassifier()
 clf.fit(X_train, y_train)
+pred = clf.predict(X_test)
+acc = accuracy_score(y_test, pred)
+print("The model is {model} and the accuracy is {accuracy:.2f}!!!".format(model = "lgb",accuracy = acc*100))
+print("The model is {0} and the accuracy is {1:.2f}%".format("lgb", acc*100))
+
+clf.fit(X, y)
+pred = pd.DataFrame(clf.predict(test_converted))
+frames = [sample_submission, pred]
+submission = pd.concat(frames, axis = 1)
+submission = submission.drop('Survived', axis = 1)
+submission = submission.rename(columns = {0:'Survived'})
+
+path = r'C:\Users\lukem\Desktop\Github AI Projects\Submissions\Titanic\ '
+submission.to_csv(path + 'submission_lgb.csv', index = False)
