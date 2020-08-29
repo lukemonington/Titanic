@@ -5,6 +5,7 @@ from sklearn import preprocessing
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
 
 
 train = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\train.csv')
@@ -45,8 +46,8 @@ X = train_converted
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 clf = lgb.LGBMClassifier()
 clf.fit(X_train, y_train)
-pred = clf.predict(X_test)
-acc = accuracy_score(y_test, pred)
+y_pred = clf.predict(X_test)
+acc = accuracy_score(y_test, y_pred)
 print("The model is {model} and the accuracy is {accuracy:.2f}!!!".format(model = "lgb",accuracy = acc*100))
 print("The model is {0} and the accuracy is {1:.2f}%".format("lgb", acc*100))
 print("The model is {} and the accuracy is {:.2f}%%".format("lgb", acc*100))
@@ -55,8 +56,12 @@ print("The model is {} and the accuracy is {:%}".format("lgb", acc)) # Percentag
 print("The model is {} and the accuracy is {:+}".format("lgb", acc*100)) # Adds a plus sign
 print("The model is {0} and the accuracy is {1:.4f}%".format("lgb",acc*100))
 
-
-
+cm = confusion_matrix(y_test, y_pred)
+print(cm)
+print("The number of true positives is {}".format(cm[0,0]))
+print("The number of false positives is {}".format(cm[0,1]))
+print("The number of true negatives is {}".format(cm[1,1]))
+print("The number of false negatives is {}".format(cm[1,0]))
 
 
 clf.fit(X, y)
