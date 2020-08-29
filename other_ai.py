@@ -62,7 +62,13 @@ pdp_Pclass = pdp.pdp_isolate(model = clf, dataset = X_test, model_features = X.c
 pdp.pdp_plot(pdp_Pclass, 'Pclass')
 plt.show()
 
+pdp_Age = pdp.pdp_isolate(model = clf, dataset = X_test, model_features = X.columns, feature = 'Age')
+pdp.pdp_plot(pdp_Age, 'Age')
+plt.show()
 
+pdp_Sex = pdp.pdp_isolate(model = clf, dataset = X_test, model_features = X.columns, feature = 'Sex')
+pdp.pdp_plot(pdp_Sex, 'Sex')
+plt.show()
 
 
 y_pred = clf.predict(X_test)
