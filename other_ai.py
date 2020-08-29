@@ -49,6 +49,15 @@ pred = clf.predict(X_test)
 acc = accuracy_score(y_test, pred)
 print("The model is {model} and the accuracy is {accuracy:.2f}!!!".format(model = "lgb",accuracy = acc*100))
 print("The model is {0} and the accuracy is {1:.2f}%".format("lgb", acc*100))
+print("The model is {} and the accuracy is {:.2f}%%".format("lgb", acc*100))
+print("The model is {model} and the accuracy is {accuracy:.2f}!!!".format(accuracy = acc*100, model = "lgb"))
+print("The model is {} and the accuracy is {:%}".format("lgb", acc)) # Percentage format
+print("The model is {} and the accuracy is {:+}".format("lgb", acc*100)) # Adds a plus sign
+print("The model is {0} and the accuracy is {1:.4f}%".format("lgb",acc*100))
+
+
+
+
 
 clf.fit(X, y)
 pred = pd.DataFrame(clf.predict(test_converted))
