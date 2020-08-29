@@ -70,6 +70,14 @@ pdp_Sex = pdp.pdp_isolate(model = clf, dataset = X_test, model_features = X.colu
 pdp.pdp_plot(pdp_Sex, 'Sex')
 plt.show()
 
+# Trying out a 2D partial dependence plot
+# Similar to previous PDP plot except we use pdp_interact instead of pdp_isolate and pdp_interact_plot instead of pdp_isolate_plot
+features_to_plot = ['Age', 'Sex']
+inter1  =  pdp.pdp_interact(model = clf, dataset=X_test, model_features=X.columns, features=features_to_plot)
+# Initially had some problems with plot_type = 'contour', but I had no problems with plot_type = 'grid'
+pdp.pdp_interact_plot(pdp_interact_out=inter1, feature_names=features_to_plot, plot_type='grid')
+plt.show()
+
 
 y_pred = clf.predict(X_test)
 acc = accuracy_score(y_test, y_pred)
