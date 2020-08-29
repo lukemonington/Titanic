@@ -7,6 +7,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
+from matplotlib import pyplot as plt
+from pdpbox import pdp, get_dataset, info_plots
 
 
 train = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\train.csv')
@@ -16,6 +18,9 @@ sample_submission = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Tita
 y = train.Survived
 train = train.drop(['Survived'], axis = 1)
 col_names = train.columns
+
+sns.set(style="darkgrid")
+ax = sns.barplot(x = y.value_counts().index, y = y.value_counts())
 
 # First impute the null values
 imp_mean = SimpleImputer(missing_values=np.nan, strategy='most_frequent')
@@ -47,6 +52,19 @@ X = train_converted
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 clf = lgb.LGBMClassifier()
 clf.fit(X_train, y_train)
+
+
+# Trying out a partial dependence plot
+# Create the data that we will plot
+pdp_Pclass = pdp.pdp_isolate(model = clf, dataset = X_test, model_features = X.columns, feature = 'Pclass')
+
+# plot it
+pdp.pdp_plot(pdp_Pclass, 'Pclass')
+plt.show()
+
+
+
+
 y_pred = clf.predict(X_test)
 acc = accuracy_score(y_test, y_pred)
 print("The model is {model} and the accuracy is {accuracy:.2f}!!!".format(model = "lgb",accuracy = acc*100))
