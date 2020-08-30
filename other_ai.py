@@ -15,9 +15,20 @@ train = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\train.cs
 test = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\test.csv')
 sample_submission = pd.read_csv(r'C:\Users\lukem\Desktop\Github AI Projects\Titanic\gender_submission.csv')
 
+#Survived dataframe
+Survived = train.loc[train.Survived == 1]
+
+#Didn't survive dataframe
+Dead = train.loc[train.Survived == 0]
+
+# Dead and in Pclass 1
+Dead_Pclass1 = train.loc[(train.Survived==0) & (train.Pclass==1)]
+
 y = train.Survived
 train = train.drop(['Survived'], axis = 1)
 col_names = train.columns
+
+
 
 sns.set(style="darkgrid")
 ax = sns.barplot(x = y.value_counts().index, y = y.value_counts())
